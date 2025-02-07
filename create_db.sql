@@ -55,7 +55,7 @@ CREATE TABLE Transactions (
     asset_id INT NOT NULL, -- Gives us the asset symbol and exchange if needed
     asset_quantity FLOAT NOT NULL,
     transaction_time DATETIME NOT NULL,
-    transaction_type BOOLEAN NOT NULL, -- Buy or sell
+    transaction_type BOOLEAN NOT NULL, -- 1 = Buy or 0 = Sell
     FOREIGN KEY (account_id) REFERENCES Accounts(account_id) ON DELETE CASCADE,
     FOREIGN KEY (asset_id) REFERENCES Assets(asset_id) ON DELETE CASCADE
 );
@@ -81,7 +81,7 @@ CREATE TABLE Carts (
 	account_id INT NOT NULL,
     asset_id INT NOT NULL,
     asset_quantity FLOAT NOT NULL,
-    transaction_type BOOLEAN NOT NULL, -- Buy or sell
+    transaction_type BOOLEAN NOT NULL, -- 1 = Buy or 0 = Sell
     PRIMARY KEY(account_id, asset_id), -- One account has one cart which has many assets
     FOREIGN KEY(asset_id) REFERENCES Assets(asset_id) ON DELETE CASCADE
 );
@@ -97,3 +97,4 @@ CREATE TABLE Performances (
 );
 
 -- Avoid "derived" fields
+-- Prices and Accounts will be Canadian for simplicity
