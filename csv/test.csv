@@ -1,0 +1,16 @@
+investor_id,first_name,last_name,date_of_birth,email,phone,home_address,occupation,funds,broker_name,account_type,account_id,asset_id,asset_quantity,symbol,price_per_share,time_updated,transaction_id,transaction_time,transaction_type
+1,Paul,Anderson,1982-10-23,paul_anderson114@gmail.com,9053349304,"1 Stanwood Cres, Toronto, ON M9M 1Z8",Contractor,20000,Wealthsimple,TFSA,1,1,10,AAPL,333.505,"2024-02-06 19:17:00",1,"2024-02-06 19:00:00",1
+1,Paul,Anderson,1982-10-23,paul_anderson114@gmail.com,9053349304,"1 Stanwood Cres, Toronto, ON M9M 1Z8",Contractor,20000,Wealthsimple,TFSA,1,1,10,AAPL,333.505,"2024-02-06 19:17:00",11,"2024-02-06 19:00:00",1
+1,Paul,Anderson,1982-10-23,paul_anderson114@gmail.com,9053349304,"1 Stanwood Cres, Toronto, ON M9M 1Z8",Contractor,20000,Wealthsimple,TFSA,1,1,10,AAPL,333.505,"2024-02-06 19:17:00",12,"2024-02-06 19:00:00",0
+1,Paul,Anderson,1982-10-23,paul_anderson114@gmail.com,9053349304,"1 Stanwood Cres, Toronto, ON M9M 1Z8",Contractor,20000,Wealthsimple,TFSA,1,2,30,GOOG,276.433,"2024-02-06 19:14:00",1,"2024-02-06 19:00:00",1
+1,Paul,Anderson,1982-10-23,paul_anderson114@gmail.com,9053349304,"1 Stanwood Cres, Toronto, ON M9M 1Z8",Contractor,20000,Wealthsimple,TFSA,1,2,30,GOOG,276.433,"2024-02-06 19:14:00",11,"2024-02-06 19:00:00",1
+1,Paul,Anderson,1982-10-23,paul_anderson114@gmail.com,9053349304,"1 Stanwood Cres, Toronto, ON M9M 1Z8",Contractor,20000,Wealthsimple,TFSA,1,2,30,GOOG,276.433,"2024-02-06 19:14:00",12,"2024-02-06 19:00:00",0
+2,Emily,Johnson,1990-05-15,emily_johnson22@gmail.com,4165551234,"25 Yonge St, Toronto, ON M5E 1E5","Software Engineer",35000,Wealthsimple,RRSP,2,2,5,GOOG,276.433,"2024-02-06 19:14:00",2,"2024-02-06 19:00:00",0
+3,Michael,Smith,1985-12-10,michael_smith89@gmail.com,6475556789,"100 Queen St W, Toronto, ON M5H 2N2","Financial Analyst",50000,Questrade,TFSA,3,4,8,MSFT,594.623,"2024-02-06 19:17:00",3,"2024-02-06 19:00:00",1
+4,Sarah,Brown,1978-03-25,sarah_brown78@gmail.com,9055559876,"200 Bay St, Toronto, ON M5J 2J5","Marketing Manager",28000,Wealthsimple,FHSA,4,3,15,SHOP,169.97,"2024-02-06 16:00:00",4,"2024-02-06 19:00:00",0
+5,David,Lee,1995-07-30,david_lee95@gmail.com,4165554321,"150 King St W, Toronto, ON M5H 1J9","Data Scientist",42000,Questrade,RRSP,5,5,12,AMZN,341.527,"2024-02-06 19:17:00",5,"2024-02-06 19:00:00",1
+6,Jessica,Taylor,1988-09-12,jessica_taylor88@gmail.com,6475558765,"55 Bloor St W, Toronto, ON M4W 1A5","Graphic Designer",31000,Wealthsimple,RESP,6,6,20,TD,82.86,"2024-02-06 16:00:00",6,"2024-02-06 19:00:00",1
+7,Daniel,Wilson,1980-11-20,daniel_wilson80@gmail.com,9055553210,"10 Dundas St E, Toronto, ON M5B 2G9",Teacher,25000,Questrade,RESP,7,7,6,TSLA,535.278,"2024-02-06 19:15:00",7,"2024-02-06 19:00:00",0
+8,Laura,Martinez,1992-02-18,laura_martinez92@gmail.com,4165556543,"30 St. Patrick St, Toronto, ON M5T 3A3",Nurse,38000,Wealthsimple,LIRA,8,8,7,META,1018.15,"2024-02-06 19:01:00",8,"2024-02-06 19:00:00",1
+9,James,Garcia,1987-06-05,james_garcia87@gmail.com,6475557890,"40 College St, Toronto, ON M5G 2J3",Architect,45000,Questrade,LIRA,9,9,25,BNS,72.89,"2024-02-06 16:00:00",9,"2024-02-06 19:00:00",1
+10,Olivia,Davis,1998-04-22,olivia_davis98@gmail.com,9055552345,"70 University Ave, Toronto, ON M5J 2M4",Student,15000,Questrade,FHSA,10,1,3,AAPL,333.505,"2024-02-06 19:17:00",10,"2024-02-06 19:00:00",0

@@ -1,11 +1,3 @@
-/*
-
-CP363 Assignment 4 - Populating Tables, Designing Queries, and Creating Views
-Authors: Vicky Sekhon and Christopher Ooi En Shen
-Date: February 7th, 2025
-
-*/
-
 USE database363;
 
 -- Insert Investors
@@ -95,6 +87,7 @@ VALUES
 INSERT INTO Portfolios (account_id, asset_id, asset_quantity)
 VALUES
 (1, 1, 10),  -- Paul Anderson owns 10 shares of AAPL
+(1, 2, 30),  -- Paul Anderson owns 30 shares of GOOG
 (2, 2, 5),   -- Emily Johnson owns 5 shares of GOOG
 (3, 4, 8),   -- Michael Smith owns 8 shares of MSFT
 (4, 3, 15),  -- Sarah Brown owns 15 shares of SHOP
@@ -109,6 +102,7 @@ VALUES
 INSERT INTO Transactions (account_id, asset_id, asset_quantity, transaction_time, transaction_type)
 VALUES
 (1, 1, 10, '2024-02-06 19:00:00', 1),  -- Paul Anderson bought 10 shares of AAPL
+(1, 2, 30, '2024-02-06 19:00:00', 1),  -- Paul Anderson bought 30 shares of GOOG
 (2, 2, 5, '2024-02-06 19:00:00', 1),   -- Emily Johnson bought 5 shares of GOOG
 (3, 4, 8, '2024-02-06 19:00:00', 1),   -- Michael Smith bought 8 shares of MSFT
 (4, 3, 15, '2024-02-06 19:00:00', 1),  -- Sarah Brown bought 15 shares of SHOP
@@ -130,7 +124,7 @@ VALUES
 (6, 6, 82.00),   -- Jessica Taylor is watching TD
 (7, 7, 355.00),  -- Daniel Wilson is watching TSLA
 (8, 8, 680.00),  -- Laura Martinez is watching META
-(9, 9, 71.00),   -- James Garcia is watching BNS
+(9, 9, 73.00),   -- James Garcia is watching BNS
 (10, 1, 230.00); -- Olivia Davis is watching AAPL
 
 -- Insert Carts
@@ -152,6 +146,8 @@ INSERT INTO Performances (account_id, initial_price, current_price, performance_
 VALUES
 -- Paul Anderson (Account 1): 10 shares of AAPL
 (1, 10 * 233.22 * 1.43, 10 * 233.22 * 1.43, '2024-02-06 19:27:00'),
+-- Paul Anderson (Account 1): 10 shares of AAPL
+(1, 10 * 233.22 * 1.43, (10 * 233.22 * 1.43) + (30 * 193.31 * 1.43), '2024-02-06 19:27:00'),
 -- Emily Johnson (Account 2): 5 shares of GOOG
 (2, 5 * 193.31 * 1.43, 5 * 193.31 * 1.43, '2024-02-06 19:27:00'),
 -- Michael Smith (Account 3): 8 shares of MSFT
@@ -170,3 +166,168 @@ VALUES
 (9, 25 * 72.89, 25 * 72.89, '2024-02-06 19:27:00'),  -- BNS is already in CAD
 -- Olivia Davis (Account 10): 3 shares of AAPL
 (10, 3 * 233.22 * 1.43, 3 * 233.22 * 1.43, '2024-02-06 19:27:00');
+
+SELECT 
+i.first_name, i.last_name, i.funds, b.broker_name, b.account_type, p.asset_quantity, a_set.symbol, a_set.price_per_share, a_set.time_updated
+FROM Investors i join Accounts a on i.investor_id = a.investor_id join Brokers b on a.broker_id = b.broker_id join Portfolios p on a.account_id = p.account_id join Assets a_set on p.asset_id = a_set.asset_id;
+
+
+-- Retrieves an Investor's funds and all the assets that they own across multiple accounts and multiple broekrs
+SELECT 
+i.first_name, i.last_name, i.funds, b.broker_name, b.account_type, a_set.symbol, p.asset_quantity, ROUND(a_set.price_per_share * asset_quantity, 2) AS total_value
+FROM Investors i join Accounts a on i.investor_id = a.investor_id join Brokers b on a.broker_id = b.broker_id join Portfolios p on a.account_id = p.account_id join Assets a_set on p.asset_id = a_set.asset_id WHERE i.first_name = 'Paul' and i.last_name = "Anderson";
+
+
+SELECT i.investor_id, i.first_name, i.last_name, i.funds
+FROM Investors i
+WHERE i.funds > 10000
+AND NOT EXISTS (
+    SELECT 1 FROM Transactions t 
+    JOIN Accounts a ON t.account_id = a.account_id
+    WHERE a.investor_id = i.investor_id
+);
+
+SELECT * FROM Assets 
+WHERE price_per_share = (SELECT MAX(price_per_share) FROM Assets);
+
+SELECT DISTINCT i.investor_id, i.first_name, i.last_name, i.funds
+FROM Investors i
+JOIN Accounts a ON i.investor_id = a.investor_id
+JOIN Portfolios p ON a.account_id = p.account_id
+WHERE p.asset_quantity * (SELECT price_per_share FROM Assets WHERE asset_id = p.asset_id) > i.funds;
+
+
+SELECT i.investor_id, i.first_name, i.last_name, SUM(p.asset_quantity) AS total_assets
+FROM Investors i
+JOIN Accounts a ON i.investor_id = a.investor_id
+JOIN Portfolios p ON a.account_id = p.account_id
+GROUP BY i.investor_id;
+
+SELECT b.broker_id, b.broker_name, COUNT(account_type) AS account_count
+FROM Brokers b
+JOIN Accounts a ON b.broker_id = a.broker_id
+ORDER BY account_count DESC
+LIMIT 1;
+
+
+-- Queries
+
+-- Broker with the most accounts
+SELECT broker_name, COUNT(account_type) AS account_count
+FROM Brokers
+GROUP BY broker_name
+ORDER BY account_count DESC
+LIMIT 1;
+
+
+select * from Portfolios
+join Assets on Portfolios.asset_id = Assets.asset_id
+where account_id = 1;
+
+-- Find the highest amount invested across all portfolios
+SELECT 
+    CONCAT('$', FORMAT(ROUND(MAX(total_portfolio_value), 2), '###,###.##')) AS highest_portfolio_value
+FROM (
+    SELECT 
+        account_id, 
+        SUM(asset_quantity * price_per_share) AS total_portfolio_value
+    FROM Portfolios
+    JOIN Assets ON Portfolios.asset_id = Assets.asset_id
+    GROUP BY account_id
+) AS account_portfolios;
+
+
+-- Total amount invested across all users
+select CONCAT('$', FORMAT(ROUND(SUM(asset_quantity * price_per_share), 2), '###,###.##')) As total_amount_invested_across_all_portfolios
+from Portfolios
+join Assets on Portfolios.asset_id = Assets.asset_id;
+
+-- Find percent increase of a single portfolio
+SELECT CONCAT(FORMAT(ROUND((current_price / initial_price) * 100, 3), 3), '%') AS portfolio_returns
+FROM Performances
+WHERE account_id = 1
+ORDER BY performance_date DESC
+LIMIT 1;
+
+-- Update the performance of a portfolio
+INSERT INTO Performances (account_id, initial_price, current_price, performance_date) 
+SELECT account_id, initial_price, 'latest_portfolio_performance', NOW()
+FROM Performances
+WHERE account_id = 1
+ORDER BY performance_date DESC
+LIMIT 1;
+
+-- Get the x,y coordinates for an investors portfolio so that it can be plotted with chart.js
+select distinct current_price as y,
+	row_number() over (order by performance_date asc) as x 
+from Performances where account_id = 1;
+
+-- Find all user's to send updates to for when an asset falls below their target_price
+select w.investor_id, a.symbol, w.target_price, a.price_per_share
+from Watchlists w
+join Assets a on a.asset_id = w.asset_id
+where a.price_per_share <= w.target_price;
+
+
+
+select * from Portfolios;
+
+
+
+
+
+select * from Performances where account_id = 1;
+
+update Performances
+set performance_date = '2024-02-06 22:58:34'
+where performance_id = 11;
+
+UPDATE Watchlists
+SET target_price = 73.00
+WHERE investor_id = 9;
+
+
+SELECT * From Performances where account_id = 1;
+
+select * from Portfolios;
+
+
+
+-- DELIMITER $$
+
+-- CREATE FUNCTION currencyFormatter(amount FLOAT)
+-- RETURNS VARCHAR(10000) DETERMINISTIC
+-- BEGIN
+--    DECLARE formattedAmount VARCHAR(10000);
+--    SET formattedAmount = CONCAT('$ ', FORMAT(amount, 2));
+--    RETURN formattedAmount;
+-- END$$
+
+-- DELIMITER ;
+
+select * from Performances;
+
+
+CREATE TABLE Initial_Prices (
+    account_id INT PRIMARY KEY, -- One row per account
+    initial_price FLOAT NOT NULL CHECK (initial_price > 0),
+    FOREIGN KEY (account_id) REFERENCES Accounts(account_id) ON DELETE CASCADE
+);
+
+select * from Initial_Prices;
+
+INSERT INTO Initial_Prices (account_id, initial_price)
+VALUES
+(1, 10 * 233.22 * 1.43),
+(2, 5 * 193.31 * 1.43),
+(3, 8 * 415.82 * 1.43),
+(4, 15 * 169.97),
+(5, 12 * 238.83 * 1.43),
+(6, 20 * 82.86),
+(7, 6 * 374.32 * 1.43),
+(8, 7 * 711.99 * 1.43),
+(9, 25 * 72.89),
+(10, 3 * 233.22 * 1.43);
+
+alter table Performances
+drop column initial_price;

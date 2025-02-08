@@ -89,11 +89,16 @@ CREATE TABLE Carts (
 
 CREATE TABLE Performances (
 	performance_id INT AUTO_INCREMENT PRIMARY KEY,
-    account_id INT NOT NULL, -- Account ids will repeat
-    initial_price FLOAT NOT NULL CHECK (initial_price > 0),
+    account_id INT NOT NULL, -- Account ids will repeat so that we can show historic performance
     current_price FLOAT NOT NULL CHECK (current_price > 0), -- Updated periodically
     performance_date DATETIME NOT NULL, -- Timestamp for when the performance was recorded
 	FOREIGN KEY (account_id) REFERENCES Accounts(account_id) ON DELETE CASCADE
+);
+
+CREATE TABLE Initial_Prices (
+    account_id INT PRIMARY KEY, -- One row per account
+    initial_price FLOAT NOT NULL CHECK (initial_price > 0),
+    FOREIGN KEY (account_id) REFERENCES Accounts(account_id) ON DELETE CASCADE
 );
 
 -- Avoid "derived" fields
