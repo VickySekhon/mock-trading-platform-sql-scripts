@@ -1,8 +1,21 @@
-# simple_investment_management_system_sql_scripts
+# Mock Trading Platform SQL Scripts
 
-## The main thing is transactions, portfolios, performances, and investor.funds for functionality
+### This repository holds all SQL queries required to create, populate, manage, and retrieve the data in a mock trading platform.
+The mock trading platform is separate and is not part of this repository
 
-## Generate dummy database records skeleton:
+### Main Functionalities: 
+Transactions, Portfolios, Performances, and Investor.funds
+
+## Entities:
+Investors
+Accounts
+Performances
+Carts
+Account Types
+Exchanges
+...
+
+### Dummy Database Records:
 Investor:
 1
 Paul
