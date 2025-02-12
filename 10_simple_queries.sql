@@ -6,7 +6,7 @@ Date: February 7th, 2025
 
 */
 
--- 13 Queries Total
+-- 10 Queries Total
 
 -- Query 1. Find all investors to send updates to for when an asset falls below their target_price
 select w.investor_id, a.symbol, w.target_price, a.price_per_share
@@ -51,11 +51,13 @@ ORDER BY performance_date DESC
 LIMIT 1;
 
 -- Query 4. The portfolio return for a single portfolio
-SELECT CONCAT(FORMAT(ROUND((current_price / initial_price) * 100, 3), 3), '%') AS portfolio_returns
-FROM Performances
-WHERE account_id = 1
-ORDER BY performance_date DESC
+SELECT CONCAT(FORMAT(ROUND((p.current_price / ip.initial_price) * 100, 3), 3), '%') AS portfolio_returns
+FROM Performances p
+JOIN Initial_Prices ip ON ip.account_id = p.account_id
+WHERE p.account_id = 1
+ORDER BY p.performance_date DESC
 LIMIT 1;
+
 
 -- Query 5. Total amount invested across all users
 select CONCAT('$', FORMAT(ROUND(SUM(asset_quantity * price_per_share), 2), '###,###.##')) As total_amount_invested_across_all_portfolios
@@ -74,31 +76,24 @@ FROM (
     GROUP BY account_id
 ) AS account_portfolios;
 
--- Query 7. Broker with the most accounts
-SELECT broker_name, COUNT(account_type) AS account_count
-FROM Brokers
-GROUP BY broker_name
-ORDER BY account_count DESC
-LIMIT 1;
-
--- Query 8. Divide investors into 4 groups based on the amount of funds they have
+-- Query 7. Divide investors into 4 groups based on the amount of funds they have
 SELECT investor_id, first_name, last_name, funds,
        NTILE(4) OVER (ORDER BY funds DESC) AS fund_quartile
 FROM Investors;
 
--- Query 9. Investors whose have more funds than the average investor
+-- Query 8. Investors who have more funds than the average investor
 SELECT investor_id, first_name, last_name, funds
 FROM Investors
 WHERE funds > (SELECT AVG(funds) FROM Investors)
 ORDER BY funds DESC;
 
--- Query 10. Funds deposited into each investors account by occupation
+-- Query 9. Funds deposited into each investors account by occupation
 SELECT occupation, funds AS total_funds
 FROM Investors
 GROUP BY occupation
 ORDER BY total_funds DESC;
 
--- Query 11. CTE (common table expression) to get total amount of investors' portfolios and rank them based on the total value across all their portfolios
+-- Query 10. CTE (common table expression) to get total amount of investors' portfolios and rank them based on the total value across all their portfolios
 with Portfoliovalues as ( 
     SELECT 
         account_id, 
@@ -113,17 +108,3 @@ From Investors i
 join Accounts a on a.investor_id = i.investor_id
 join Portfoliovalues pv on pv.account_id = a.account_id
 Order by fund_rank;
-
--- Query 12. Broker with the most accounts
-SELECT broker_name, COUNT(account_type) AS account_count
-FROM Brokers
-GROUP BY broker_name
-ORDER BY account_count DESC
-LIMIT 1;
-
--- Query 13. Each broker along with the count of accounts associated with them
-Select b.broker_name, COUNT(a.account_id) As num_accounts
-From Brokers b
-join Accounts a ON b.broker_id = a.broker_id
-group by b.broker_name
-order by num_accounts Desc;
