@@ -75,6 +75,19 @@ VALUES
 (4, 'META', 711.99 * 1.43, '2024-02-06 19:01:00'),  -- Meta Platforms Inc. (NASDAQ) in CAD
 (1, 'BNS', 72.89, '2024-02-06 16:00:00');    -- Bank of Nova Scotia (TSX)
 
+-- Insert Price Histories
+INSERT INTO Price_History (asset_id, price_per_share, time_updated)
+VALUES
+(1, 233.22 * 1.43, '2024-02-06 19:17:00'),  -- Apple Inc. (NYSE) in CAD
+(2, 193.31 * 1.43, '2024-02-06 19:14:00'),  -- Alphabet Inc. (NASDAQ) in CAD
+(3, 169.97, '2024-02-06 16:00:00'),   -- Shopify Inc. (TSX)
+(4, 415.82 * 1.43, '2024-02-06 19:17:00'),  -- Microsoft Corp. (NYSE) in CAD
+(5, 238.83 * 1.43, '2024-02-06 19:17:00'),  -- Amazon.com Inc. (NASDAQ) in CAD
+(6, 82.86, '2024-02-06 16:00:00'),     -- TD Bank (TSX)
+(7, 374.32 * 1.43, '2024-02-06 19:15:00'),  -- Tesla Inc. (NYSE) in CAD
+(8, 711.99 * 1.43, '2024-02-06 19:01:00'),  -- Meta Platforms Inc. (NASDAQ) in CAD
+(9, 72.89, '2024-02-06 16:00:00');    -- Bank of Nova Scotia (TSX)
+
 -- Insert Portfolios
 INSERT INTO Portfolios (account_id, asset_id, asset_quantity)
 VALUES
@@ -160,5 +173,18 @@ VALUES
 (8, 7 * 711.99 * 1.43, '2024-02-06 19:27:00'),   -- Laura Martinez (Account 8): 7 shares of META
 (9, 25 * 72.89, '2024-02-06 19:27:00'),          -- James Garcia (Account 9): 25 shares of BNS
 (10, 3 * 233.22 * 1.43, '2024-02-06 19:27:00'),  -- Olivia Davis (Account 10): 3 shares of AAPL
-(1, (10 * 233.22 * 1.43) + (30 * 193.31 * 1.43), '2024-02-06 19:27:00'),  -- Paul Anderson (Account 1): 30 shares of GOOG
-(11, 0, '2024-02-11 13:41:00');
+(1, (10 * 233.22 * 1.43) + (30 * 193.31 * 1.43), '2024-03-25 11:23:00');  -- Paul Anderson (Account 1): 30 shares of GOOG
+
+INSERT INTO Performance_Price (account_id, performance_date, current_price)
+VALUES
+(1, '2024-02-06 19:27:00', 10 * 233.22 * 1.43),  -- Paul Anderson (Account 1): 10 shares of AAPL
+(2, '2024-02-06 19:27:00', 5 * 193.31 * 1.43),   -- Emily Johnson (Account 2): 5 shares of GOOG
+(3, '2024-02-06 19:27:00', 8 * 415.82 * 1.43),   -- Michael Smith (Account 3): 8 shares of MSFT
+(4, '2024-02-06 19:27:00', 15 * 169.97),        -- Sarah Brown (Account 4): 15 shares of SHOP
+(5, '2024-02-06 19:27:00', 12 * 238.83 * 1.43),  -- David Lee (Account 5): 12 shares of AMZN
+(6, '2024-02-06 19:27:00', 20 * 82.86),          -- Jessica Taylor (Account 6): 20 shares of TD
+(7, '2024-02-06 19:27:00', 6 * 374.32 * 1.43),   -- Daniel Wilson (Account 7): 6 shares of TSLA
+(8, '2024-02-06 19:27:00', 7 * 711.99 * 1.43),   -- Laura Martinez (Account 8): 7 shares of META
+(9, '2024-02-06 19:27:00', 25 * 72.89),          -- James Garcia (Account 9): 25 shares of BNS
+(10,'2024-02-06 19:27:00', 3 * 233.22 * 1.43),  -- Olivia Davis (Account 10): 3 shares of AAPL
+(1, '2024-03-25 11:23:00', (10 * 233.22 * 1.43) + (30 * 193.31 * 1.43));  -- Paul Anderson (Account 1): 30 shares of GOOG

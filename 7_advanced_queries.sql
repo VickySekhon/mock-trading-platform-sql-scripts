@@ -9,8 +9,9 @@ use database363;
 
 -- Advanced queries
 -- Advanced query 1. Find most popular account and the most common asset held within that account
-select a.account_type_id, COUNT(*) As count, asst.symbol
+select a_type.account_type, COUNT(*) As count, asst.symbol
 from Accounts a
+join Account_Types a_type on a_type.account_type_id = a.account_type_id
 join Portfolios p on p.account_id = a.account_id
 join Assets asst on p.asset_id = asst.asset_id
 group by a.account_type_id
@@ -50,28 +51,29 @@ ORDER BY age DESC;
 -- Advanced views
 
 -- Advanced view 1. Investors with access to their portfolio returns (subquery in columns)
-CREATE VIEW AdvancedInvestorView AS
+CREATE VIEW InvestorViewAdv AS
 SELECT 
     i.investor_id,
     CONCAT(i.first_name, ' ', i.last_name) AS investor_name,
-	CONCAT('$', FORMAT(ROUND(SUM(ip.initial_price), 2), 2)) AS total_initial_price, -- Use dollar string formatting
-	CONCAT('$', FORMAT(ROUND(SUM(p.current_price), 2), 2)) AS total_current_price,
-    CONCAT('$', FORMAT(SUM(p.current_price - ip.initial_price), 2)) AS total_profit,
+CONCAT('$', FORMAT(ROUND(SUM(ip.initial_price), 2), 2)) AS total_initial_price, -- Use dollar string formatting
+CONCAT('$', FORMAT(ROUND(SUM(pp.current_price), 2), 2)) AS total_current_price,
+    CONCAT('$', FORMAT(SUM(pp.current_price - ip.initial_price), 2)) AS total_profit,
     -- Case #1. Only show the returns when the total initial price and total current price are not the same
     CASE 
-		WHEN SUM(ip.initial_price) < SUM(p.current_price)
-		THEN CONCAT(FORMAT((SUM(p.current_price) / SUM(ip.initial_price)) * 100, 2), '%') 
-    ELSE NULL 
-	END AS returns_percentage,
+WHEN SUM(ip.initial_price) < SUM(pp.current_price)
+THEN CONCAT(FORMAT((SUM(pp.current_price) / SUM(ip.initial_price)) * 100, 2), '%') 
+ELSE NULL 
+END AS returns_percentage,
     -- Case #2. Show increase/decrease based on current price compared to initial price
     CASE 
-        WHEN SUM(p.current_price) >= SUM(ip.initial_price) THEN 'Increase'
+        WHEN SUM(pp.current_price) >= SUM(ip.initial_price) THEN 'Increase'
         ELSE 'Decrease'
     END AS performance_trend
 FROM Investors i
 JOIN Accounts a ON i.investor_id = a.investor_id
 JOIN Performances p ON a.account_id = p.account_id
-JOIN Initial_Prices ip ON a.account_id = ip.account_id
+JOIN Initial_Prices ip ON p.account_id = ip.account_id
+JOIN Performance_Prices pp ON ip.account_id = pp.account_id
 GROUP BY i.investor_id, i.first_name, i.last_name;
 -- Outputs
 /*
@@ -92,7 +94,7 @@ GROUP BY i.investor_id, i.first_name, i.last_name;
 */
 
 -- Advanced view 2. Brokers overiew of all investors and their total assets under management by account_type (subquery in From clause)
-CREATE VIEW AdvancedBrokerView2 AS
+CREATE VIEW BrokerViewAdv AS
 SELECT 
     dt.account_type,
     COUNT(DISTINCT dt.account_id) AS total_accounts,
@@ -105,15 +107,15 @@ FROM (
     SELECT 
         at.account_type,
         a.account_id,
-        COALESCE(p.asset_quantity * ast.price_per_share, 0) AS asset_value,
+        COALESCE(p.asset_quantity * ap.price_per_share, 0) AS asset_value,
         t.transaction_id,
-        COALESCE(t.asset_quantity * ast_txn.price_per_share, 0) AS transaction_value
+        COALESCE(t.asset_quantity * ap.price_per_share, 0) AS transaction_value
     FROM Account_Types at
     JOIN Accounts a ON at.account_type_id = a.account_type_id
     LEFT JOIN Portfolios p ON a.account_id = p.account_id
     LEFT JOIN Assets ast ON p.asset_id = ast.asset_id
     LEFT JOIN Transactions t ON a.account_id = t.account_id
-    LEFT JOIN Assets ast_txn ON t.asset_id = ast_txn.asset_id
+    LEFT JOIN Asset_Prices ap ON t.asset_id = ap.asset_id
 ) AS dt
 GROUP BY dt.account_type -- Group common accounts together
 ORDER BY assets_under_management DESC;

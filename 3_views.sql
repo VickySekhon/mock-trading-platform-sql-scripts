@@ -20,7 +20,7 @@ SELECT
     END AS performance_trend
 FROM Investors i
 JOIN Accounts a ON i.investor_id = a.investor_id
-JOIN Performances p ON a.account_id = p.account_id
+JOIN Performance_Prices p ON a.account_id = p.account_id
 JOIN Initial_Prices ip ON a.account_id = ip.account_id
 GROUP BY i.investor_id, i.first_name, i.last_name;
 
@@ -49,13 +49,12 @@ SELECT
     COUNT(DISTINCT a.account_id) AS total_accounts,
     ROUND(SUM(p.asset_quantity * ast.price_per_share), 2) AS assets_under_management,
     COUNT(t.transaction_id) AS total_transactions,
-    ROUND(SUM(t.asset_quantity * ast_txn.price_per_share), 2) AS total_transaction_volume
+    ROUND(SUM(t.asset_quantity * ast.price_per_share), 2) AS total_transaction_volume
 FROM Account_Types at
 JOIN Accounts a ON at.account_type_id = a.account_type_id
 LEFT JOIN Portfolios p ON a.account_id = p.account_id
-LEFT JOIN Assets ast ON p.asset_id = ast.asset_id
+LEFT JOIN Asset_Prices ast ON p.asset_id = ast.asset_id
 LEFT JOIN Transactions t ON a.account_id = t.account_id
-LEFT JOIN Assets ast_txn ON t.asset_id = ast_txn.asset_id
 GROUP BY at.account_type
 ORDER BY assets_under_management DESC;
 
@@ -71,6 +70,15 @@ RRSP         | 2             | 5480.49                 | 2                  | 54
 RESP         | 2             | 4868.87                 | 2                  | 4868.87
 FHSA         | 2             | 3550.06                 | 2                  | 3550.06
 
+! Latest:
+account_type | total_accounts | assets_under_management | total_transactions | total_transaction_volume
+------------------------------------------------------------------------------------------------------
+TFSA         | 2             | 25924.13                | 5                  | 28013.07
+LIRA         | 2             | 8949.27                 | 2                  | 8949.27
+RRSP         | 2             | 5480.49                 | 2                  | 5480.49
+RESP         | 2             | 4868.87                 | 2                  | 4868.87
+FHSA         | 2             | 3550.06                 | 2                  | 3550.06
+
 */
 
 -- View #3 - Brokers
@@ -80,8 +88,8 @@ SELECT
     I.first_name,
     I.last_name,
     I.date_of_birth,
-    I.email,
-    I.phone,
+    E.email,
+    PN.phone,
     I.home_address,
     I.occupation,
     I.funds,
@@ -90,16 +98,19 @@ SELECT
     P.asset_id,
     P.asset_quantity,
     ASST.symbol,
-    ASST.price_per_share,
-    ASST.time_updated,
+    ASSTP.price_per_share,
+    ASSTP.time_updated,
     T.transaction_id,
     T.transaction_time,
     T.transaction_type
 FROM Investors I
+JOIN Emails E on E.investor_id = I.investor_id
+JOIN Phone_Numbers PN on PN.investor_id = I.investor_id
 JOIN Accounts A ON I.investor_id = A.investor_id
 JOIN Account_Types AType ON AType.account_type_id = A.account_type_id
 JOIN Portfolios P ON A.account_id = P.account_id
 JOIN Assets ASST ON P.asset_id = ASST.asset_id
+JOIN Asset_Prices ASSTP ON ASSTP.asset_id = ASST.asset_id
 LEFT JOIN Transactions T ON A.account_id = T.account_id;
 -- Outputs
 /*

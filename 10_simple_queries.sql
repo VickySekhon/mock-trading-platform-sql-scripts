@@ -9,15 +9,18 @@ Date: February 7th, 2025
 -- 10 Queries Total
 
 -- Query 1. Find all investors to send updates to for when an asset falls below their target_price
-select w.investor_id, a.symbol, w.target_price, a.price_per_share
+select w.investor_id, a.symbol, w.target_price, ap.price_per_share
 from Watchlists w
 join Assets a on a.asset_id = w.asset_id
-where a.price_per_share <= w.target_price;
+join Asset_Prices ap on ap.asset_id = a.asset_id
+where ap.price_per_share <= w.target_price;
 
 -- Query 2. (x,y) coordinates for an investors portfolio so that it can be plotted with chart.js
-select distinct current_price as y,
-	row_number() over (order by performance_date asc) as x 
-from Performances where account_id = 1;
+select distinct pp.current_price as y,
+	row_number() over (order by p.performance_date asc) as x 
+from Performances p
+join Performance_Prices pp on pp.account_id = p.account_id and pp.performance_date = p.performance_date
+where p.account_id = 1;
 
 /*
 Query 3. Application logic for when an investor presses "Buy"  
@@ -43,16 +46,19 @@ ON DUPLICATE KEY UPDATE
     asset_quantity = VALUES(asset_quantity);
 
 -- 4. Performance table updated
-INSERT INTO Performances (account_id, initial_price, current_price, performance_date) 
-SELECT account_id, initial_price, current_price + ('a.price_per_share'*'z'), NOW()
-FROM Performances
+INSERT INTO Performances (account_id, performance_date) 
+(account_id, NOW())
+
+INSERT INTO Performance_Prices (account_id, performance_date, current_price) 
+SELECT account_id, NOW(), current_price + ('a.price_per_share'*'quantity')
+FROM Performance_Prices
 WHERE account_id = 1
 ORDER BY performance_date DESC
 LIMIT 1;
 
 -- Query 4. The portfolio return for a single portfolio
-SELECT CONCAT(FORMAT(ROUND((p.current_price / ip.initial_price) * 100, 3), 3), '%') AS portfolio_returns
-FROM Performances p
+SELECT CONCAT(FORMAT(ROUND(((p.current_price - ip.initial_price)/ip.initial_price) * 100, 3), 3), '%') AS portfolio_returns
+FROM Performance_Prices p
 JOIN Initial_Prices ip ON ip.account_id = p.account_id
 WHERE p.account_id = 1
 ORDER BY p.performance_date DESC
@@ -60,9 +66,10 @@ LIMIT 1;
 
 
 -- Query 5. Total amount invested across all users
-select CONCAT('$', FORMAT(ROUND(SUM(asset_quantity * price_per_share), 2), '###,###.##')) As total_amount_invested_across_all_portfolios
-from Portfolios
-join Assets on Portfolios.asset_id = Assets.asset_id;
+SELECT CONCAT('$', FORMAT(SUM(p.asset_quantity * ap.price_per_share), 2)) AS total_amount_invested_across_all_portfolios
+FROM Portfolios p
+JOIN Assets a ON p.asset_id = a.asset_id
+JOIN Asset_Prices ap ON ap.asset_id = a.asset_id;
 
 -- Query 6. The highest amount invested across all portfolios
 SELECT 
@@ -73,6 +80,7 @@ FROM (
         SUM(asset_quantity * price_per_share) AS total_portfolio_value
     FROM Portfolios
     JOIN Assets ON Portfolios.asset_id = Assets.asset_id
+    JOIN Asset_Prices ON Assets.asset_id = Asset_Prices.asset_id
     GROUP BY account_id
 ) AS account_portfolios;
 
@@ -100,6 +108,7 @@ with Portfoliovalues as (
         SUM(asset_quantity * price_per_share) AS total_portfolio_value
     FROM Portfolios
     JOIN Assets ON Portfolios.asset_id = Assets.asset_id
+    JOIN Asset_Prices ON Assets.asset_id = Asset_Prices.asset_id
     GROUP BY account_id
 )
 Select i.investor_id, i.first_name, i.last_name, CONCAT('$', FORMAT(ROUND(pv.total_portfolio_value, 2), '###,###.##')) as funds, 

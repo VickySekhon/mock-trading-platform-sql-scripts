@@ -36,6 +36,24 @@ CREATE TABLE Assets (
     FOREIGN KEY (exchange_id) REFERENCES Exchanges(exchange_id) ON DELETE CASCADE
 );
 
+/*
+    Purpose is to store historic price returns for an asset.
+
+    Assets table is updated to:
+    - asset_id
+    - exchange_id
+    - symbol
+    
+    to remove redundancy
+*/
+CREATE TABLE Price_History (
+    price_id INT AUTO_INCREMENT PRIMARY KEY,
+    asset_id INT NOT NULL,
+    price_per_share FLOAT NOT NULL CHECK (price_per_share > 0),
+    time_updated DATETIME NOT NULL,
+    FOREIGN KEY (asset_id) REFERENCES Assets(asset_id) ON DELETE CASCADE
+);
+
 -- Doesn't have it's own id
 -- Multiple entries for different assets in a single account, but simply update row for the same asset
 CREATE TABLE Portfolios (
