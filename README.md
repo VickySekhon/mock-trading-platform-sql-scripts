@@ -2,7 +2,7 @@
 
 This repository holds all SQL queries required to create, populate, manage, and retrieve the data in a mock trading platform.
 
-### Main Functionalities: 
+## Main Functionalities: 
 Transactions, Portfolios, Performances, and Investor.funds
 
 ## Entities:
